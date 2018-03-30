@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" type="text/css" href="main.css">
+<body>
+
+
+<fieldset>
+    <legend>通话</legend>
+    <video id="localVideo" class="videoWrapper" autoplay></video>
+    <video id="remoteVideo" class="videoWrapper" autoplay></video>
+</fieldset>
+
+<fieldset>
+    <legend>屏幕共享(观看发起方屏幕)</legend>
+    <video id="screenVideo" class="videoWrapper" autoplay></video>
+</fieldset>
+
+<br/>
+
+<button onclick="startCall()">开始点对点通话</button>
+<button onclick="exit()">关闭socket连接</button>
+<button onclick="speaker()">开启/关闭扬声器</button>
+<button onclick="startScreen()">屏幕共享</button>
+
+
+<script src="adapter.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
