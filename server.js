@@ -23,7 +23,7 @@ let getRoomClients = (room) => {
 };
 
 wss.on('connection', function (currentClient, reg) {
-    console.log('ws is conected！room:', reg.url);
+    console.log('ws is conected！');
     let room = reg.url;
 
     wssArr.push({ room: room, client: currentClient });
@@ -36,6 +36,7 @@ wss.on('connection', function (currentClient, reg) {
 
         let result = typeof data === 'string' ? JSON.parse(data) : data;
         if (result && result.type === 'name') {
+            console.log(result.value + '连接成功');
             wssArr.forEach((i) => {
                 if (i.client === currentClient){
                     i.name = result.value;
@@ -43,10 +44,8 @@ wss.on('connection', function (currentClient, reg) {
             });
         }
 
-
         //寻找匹配的房间号l连接
         let roomClients = getRoomClients(room);
-        console.log(roomClients.length)
 
         roomClients.forEach((item) => {
             item.client.send(JSON.stringify({
@@ -64,6 +63,9 @@ wss.on('connection', function (currentClient, reg) {
 
     currentClient.on('close', function () {
         wssArr = wssArr.filter((item) => {
+            if (item.client === currentClient){
+                console.log(item.name + '已断连');
+            }
             return item.client !== currentClient;
         });
         let roomClients = getRoomClients(room);
@@ -76,7 +78,7 @@ wss.on('connection', function (currentClient, reg) {
                 })
             }));
         });
-        console.log('ws is closed', room);
+        console.log('ws is closed');
     });
 
 });

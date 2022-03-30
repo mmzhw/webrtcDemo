@@ -25,7 +25,7 @@ let remoteVideo = document.getElementById('remoteVideo');
 let screenVideo = document.getElementById('screenVideo');
 
 let room = '';
-let user = random('USER');
+let user = random('USER-');
 if (window.location.search.match('room=')) {
     room = window.location.search.replace('?room=', '');
 }
