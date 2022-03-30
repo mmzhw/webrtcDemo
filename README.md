@@ -42,6 +42,6 @@ make install
    cd /usr/local/turnserver/  
    ./bin/turnserver -v -r 39.96.xxx.xxx -a -o -c ./etc/turnserver.conf  
 
-注意：一定要打开相关端口，配置UDP、TCP。
+注意：一定要打开相关端口，配置UDP、TCP。  
 7. 测试地址
 https://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/
