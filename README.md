@@ -40,8 +40,9 @@ make install
    realm=mycompany.org #域名，可选
 6. 启动服务
    cd /usr/local/turnserver/  
-   ./bin/turnserver -v -r 39.96.xxx.xxx -a -o -c ./etc/turnserver.conf  
-
-注意：一定要打开相关端口，配置UDP、TCP。  
+   ./bin/turnserver -v -r 39.96.xxx.xxx -a -o -c ./etc/turnserver.conf
 7. 测试地址
 https://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/
+
+
+注意：一定要打开相关端口，配置UDP、TCP。  
