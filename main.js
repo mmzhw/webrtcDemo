@@ -25,32 +25,37 @@ let remoteVideo = document.getElementById('remoteVideo');
 let screenVideo = document.getElementById('screenVideo');
 
 let room = '';
+let user = random('USER');
 if (window.location.search.match('room=')) {
     room = window.location.search.replace('?room=', '');
 }
 
 document.getElementById('roomid').value = room;
+document.getElementById('userid').value = user;
 
 let socket = null;
 let startWSConnect = () => {
-    if (!room) {
+    if (!room || !user) {
+        document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + '请填写用户名和房间号';
         return;
     }
     socket = new WebSocket('wss://' + window.location.hostname + ':3002/' + room);
 
     socket.onopen = () => {
+        document.getElementById('userid').disabled = true;
+        document.getElementById('roomid').disabled = true;
         document.getElementById('connectid').disabled = true;
         document.getElementById('startcallid').disabled = false;
         document.getElementById('closewsid').disabled = false;
         document.getElementById('mutedid').disabled = false;
         document.getElementById('screenid').disabled = false;
 
-        document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + '加入房间' + room;
+        document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + '成功加入房间' + room;
+        socket.send(JSON.stringify({ type: 'name', value: document.getElementById('userid').value }));
     };
 
     socket.onclose = () => {
         console.log('ws is close');
-
         socket = null;
     };
 
@@ -61,11 +66,12 @@ let startWSConnect = () => {
         if (result.code === '-1') {
             document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + result.message;
             exit();
-            return
+            return;
         }
         if (result.code === '99') {
-            document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + result.message;
-            return
+            document.getElementById('onlineNum').innerHTML = result.result.length;
+            document.getElementById('onlineUser').innerHTML = result.result.join('， ');
+            return;
         }
 
         screenStatus = !!result.screen;
@@ -200,6 +206,8 @@ let exit = () => {
     document.getElementById('mutedid').disabled = true;
     document.getElementById('screenid').disabled = true;
     document.getElementById('connectid').disabled = false;
+    document.getElementById('userid').disabled = false;
+    document.getElementById('roomid').disabled = false;
     socket.close();
 };
 

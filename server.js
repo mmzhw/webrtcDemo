@@ -16,29 +16,46 @@ let wss = new WebSocket.Server({ server });
 
 let wssArr = [];
 
+let getRoomClients = (room) => {
+    return wssArr.filter((item) => {
+        return item.room === room;
+    });
+};
+
 wss.on('connection', function (currentClient, reg) {
     console.log('ws is conected！room:', reg.url);
     let room = reg.url;
 
     wssArr.push({ room: room, client: currentClient });
-    let roomClients = wssArr.filter((item) => {
-        return item.room === room;
-    });
-    if (roomClients.length > 2) {
+
+    if (getRoomClients(room).length > 2) {
         currentClient.send(JSON.stringify({ code: '-1', message: '房间已满' }));
-    } else {
-        roomClients.forEach((item) => {
-            item.client.send(JSON.stringify({ code: '99', message: '当前房间内人员数:' + roomClients.length }));
-        });
     }
 
     currentClient.on('message', function (data) {
-        //寻找匹配的房间号
-        let roomClients = wssArr.filter((item) => {
-            return item.room === room;
-        });
+
+        let result = typeof data === 'string' ? JSON.parse(data) : data;
+        if (result && result.type === 'name') {
+            wssArr.forEach((i) => {
+                if (i.client === currentClient){
+                    i.name = result.value;
+                }
+            });
+        }
+
+
+        //寻找匹配的房间号l连接
+        let roomClients = getRoomClients(room);
+        console.log(roomClients.length)
 
         roomClients.forEach((item) => {
+            item.client.send(JSON.stringify({
+                code: '99',
+                message: '当前房间内人员数:' + roomClients.length,
+                result: roomClients.map((j) => {
+                    return j.name;
+                })
+            }));
             if (item.client !== currentClient) {
                 item.client.send(data);
             }
@@ -48,6 +65,16 @@ wss.on('connection', function (currentClient, reg) {
     currentClient.on('close', function () {
         wssArr = wssArr.filter((item) => {
             return item.client !== currentClient;
+        });
+        let roomClients = getRoomClients(room);
+        roomClients.forEach((item) => {
+            item.client.send(JSON.stringify({
+                code: '99',
+                message: '当前房间内人员数:' + roomClients.length,
+                result: roomClients.map((j) => {
+                    return j.name;
+                })
+            }));
         });
         console.log('ws is closed', room);
     });

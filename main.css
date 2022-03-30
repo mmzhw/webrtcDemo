@@ -8,3 +8,21 @@
     height: 30px;
     box-sizing: border-box;
 }
+
+.line {
+    padding-bottom: 10px;
+}
+
+.videoContent {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.videoContent p {
+    padding: 0;
+    margin: 0;
+}
+
+.tip {
+    padding-top: 10px;
+}
