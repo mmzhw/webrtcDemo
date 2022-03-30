@@ -3,3 +3,8 @@
     border: 1px solid #ccc;
     margin-right: 10px;
 }
+
+.butinput {
+    height: 30px;
+    box-sizing: border-box;
+}

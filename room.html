@@ -14,20 +14,21 @@
     <video id="remoteVideo" class="videoWrapper" autoplay></video>
 </fieldset>
 
-<fieldset style="display: none">
+<fieldset>
     <legend>屏幕共享(观看发起方屏幕)</legend>
     <video id="screenVideo" class="videoWrapper" autoplay></video>
+    <div>chrome要屏幕共享需要在属性中添加--enable-usermedia-screen-capturing</div>
 </fieldset>
 
 <br/>
 <fieldset>
     <legend>操作</legend>
-    <input class="butinput" id="roomid"/>
+    <input class="butinput" id="roomid" placeholder="输入房间号"/>
     <button class="butinput" id="connectid" onclick="startWSConnect()">开启socket连接</button>
     <button class="butinput" id="startcallid" onclick="startCall()" disabled>开始点对点通话</button>
     <button class="butinput" id="closewsid" onclick="exit()" disabled>关闭socket连接</button>
     <button class="butinput" id="mutedid" onclick="speaker()" disabled>开启/关闭扬声器</button>
-    <button class="butinput" style="display: none" id="screenid" onclick="startScreen()" disabled>屏幕共享</button>
+    <button class="butinput" id="screenid" onclick="startScreen()" disabled>屏幕共享</button>
 </fieldset>
 
 <br/>
