@@ -24,8 +24,8 @@ if (window.location.search.match('room=')) {
     room = window.location.search.replace('?room=', '');
 }
 
-document.getElementById('roomid').value = room;
-document.getElementById('userid').value = user;
+// document.getElementById('roomid').value = room;
+// document.getElementById('userid').value = user;
 
 let socket = null;
 let startWSConnect = () => {
@@ -36,7 +36,7 @@ let startWSConnect = () => {
     socket = new WebSocket('wss://' + window.location.hostname + ':3002/' + room);
     socket.onopen = () => {
         document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + '成功加入房间' + room;
-        socket.send(JSON.stringify({ direction: 'name', value: document.getElementById('userid').value }));
+        socket.send(JSON.stringify({ direction: 'name', value: user }));
     };
 
     socket.onclose = () => {
@@ -49,7 +49,11 @@ let startWSConnect = () => {
 
         let result = typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
         if (result.code === '-1') {
-            document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + result.message;
+            alert('会议已满');
+            socket.close();
+            document.getElementById('startcallid').disabled = true;
+            document.getElementById('endcallid').disabled = true;
+            // document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + result.message;
             exit(true);
             return;
         }
@@ -59,8 +63,8 @@ let startWSConnect = () => {
             return;
         }
 
-        if (result.direction === 'leave'){
-            exit(true)
+        if (result.direction === 'leave') {
+            exit(true);
             return;
         }
 
@@ -85,7 +89,7 @@ let createPeerConnection = () => {
             console.log(event.candidate);
         } else {
             let data = {
-                direction:'call',
+                direction: 'call',
                 type: pc.localDescription.type,
                 sdp: pc.localDescription.sdp,
             };
@@ -101,6 +105,9 @@ let createPeerConnection = () => {
 
 
 let startCall = () => {
+    document.getElementById('startcallid').disabled = true;
+    document.getElementById('endcallid').disabled = false;
+
     navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true,
@@ -138,16 +145,18 @@ let createOfferAndAnswer = () => {
 
 
 let exit = (notNotify) => {
-    if (!notNotify){
-        socket.send(JSON.stringify({ direction: 'leave', value: document.getElementById('userid').value }));
+    if (!notNotify) {
+        socket.send(JSON.stringify({ direction: 'leave', value: user }));
     }
-
+    document.getElementById('startcallid').disabled = false;
+    document.getElementById('endcallid').disabled = true;
+    isCalled = false;
     document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + '离开房间';
     pc.close();
     pc = null;
     localVideo.src = '';
     remoteVideo.src = '';
-    createPeerConnection()
+    createPeerConnection();
 };
 
 let speaker = () => {
@@ -156,4 +165,4 @@ let speaker = () => {
 
 
 startWSConnect();
-createPeerConnection()
+createPeerConnection();

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" type="text/css" href="main2.css">
+<body>
+<div class="videoContent">
+    <div>
+        <video id="localVideo" class="videoWrapper" autoplay muted></video>
+    </div>
+    <div>
+        <div>
+            <video id="remoteVideo" class="videoWrapper" autoplay></video>
+            <div class="line">参与者： <span id="onlineNum"></span></div>
+            <div class="line"><span id="onlineUser"></span></div>
+            <div class="line">
+                <p>会见时间:</p>
+                <p>律师姓名:</p>
+                <p>执业证号:</p>
+                <p>执业机构:</p>
+                <p>助手姓名:</p>
+                <p>姓名:</p>
+                <p>身份证号:</p>
+                <p>监管单位:</p>
+            </div>
+        </div>
+        <div>
+            <button class="butinput" id="startcallid" onclick="startCall()">呼叫</button>
+            <button class="butinput" id="endcallid" onclick="exit()" disabled>结束会议</button>
+        </div>
+    </div>
+</div>
+<fieldset style="display: none">
+    <legend>通知</legend>
+    <div id="message"></div>
+</fieldset>
+
+
+<script src="adapter.js"></script>
+<script src="tools.js"></script>
+<script src="main2.js"></script>
+</body>
+</html>

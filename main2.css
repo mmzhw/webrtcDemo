@@ -8,6 +8,7 @@ body {
 
 .butinput {
     height: 30px;
+    width: 45%;
     box-sizing: border-box;
 }
 
@@ -28,7 +29,7 @@ body {
 
 .videoContent > div:nth-child(1) {
     flex: 1;
-    height: 87vh;
+    height: calc(100vh - 40px);
     background: black;
     display: flex;
     justify-content: center;
@@ -43,8 +44,12 @@ body {
     justify-content: space-between;
 }
 
-.videoContent > div:nth-child(2) > div > video {
+.videoContent > div:nth-child(2) > div:nth-child(1) > video {
     margin-bottom: 10px;
+}
+.videoContent > div:nth-child(2) > div:nth-child(2) {
+    display: flex;
+    justify-content: space-between;
 }
 
 .videoContent > div video {
