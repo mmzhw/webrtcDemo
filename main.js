@@ -51,7 +51,7 @@ let startWSConnect = () => {
         document.getElementById('screenid').disabled = false;
 
         document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + '成功加入房间' + room;
-        socket.send(JSON.stringify({ type: 'name', value: document.getElementById('userid').value }));
+        socket.send(JSON.stringify({ direction: 'name', value: document.getElementById('userid').value }));
     };
 
     socket.onclose = () => {
@@ -168,6 +168,7 @@ pc.onicecandidate = (event) => {
         console.log(event.candidate);
     } else {
         let data = {
+            direction:'call',
             type: pc.localDescription.type,
             sdp: pc.localDescription.sdp,
             screen: 0,
@@ -186,6 +187,7 @@ screenPc.onicecandidate = (event) => {
         console.log(event.candidate);
     } else {
         let data = {
+            direction:'call',
             type: screenPc.localDescription.type,
             sdp: screenPc.localDescription.sdp,
             screen: 1,
@@ -209,6 +211,8 @@ let exit = () => {
     document.getElementById('userid').disabled = false;
     document.getElementById('roomid').disabled = false;
     socket.close();
+    pc.close()
+    screenPc.close()
 };
 
 let speaker = () => {

@@ -33,37 +33,37 @@ wss.on('connection', function (currentClient, reg) {
     }
 
     currentClient.on('message', function (data) {
+        let roomClients = getRoomClients(room);
 
         let result = typeof data === 'string' ? JSON.parse(data) : data;
-        if (result && result.type === 'name') {
+        if (result && result.direction === 'name') {
             console.log(result.value + '连接成功');
             wssArr.forEach((i) => {
-                if (i.client === currentClient){
+                if (i.client === currentClient) {
                     i.name = result.value;
                 }
             });
+            roomClients.forEach((item) => {
+                item.client.send(JSON.stringify({
+                    code: '99',
+                    message: '当前房间内人员数:' + roomClients.length,
+                    result: roomClients.map((j) => {
+                        return j.name;
+                    })
+                }));
+            });
+        } else {
+            roomClients.forEach((item) => {
+                if (item.client !== currentClient) {
+                    item.client.send(data);
+                }
+            });
         }
-
-        //寻找匹配的房间号l连接
-        let roomClients = getRoomClients(room);
-
-        roomClients.forEach((item) => {
-            item.client.send(JSON.stringify({
-                code: '99',
-                message: '当前房间内人员数:' + roomClients.length,
-                result: roomClients.map((j) => {
-                    return j.name;
-                })
-            }));
-            if (item.client !== currentClient) {
-                item.client.send(data);
-            }
-        });
     });
 
     currentClient.on('close', function () {
         wssArr = wssArr.filter((item) => {
-            if (item.client === currentClient){
+            if (item.client === currentClient) {
                 console.log(item.name + '已断连');
             }
             return item.client !== currentClient;

@@ -4,51 +4,57 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<link rel="stylesheet" type="text/css" href="main.css">
+<link rel="stylesheet" type="text/css" href="main2.css">
 <body>
 
 
-<fieldset class="videoContent">
-    <legend>通话</legend>
+<div class="videoContent">
     <div>
         <video id="localVideo" class="videoWrapper" autoplay muted></video>
-        <p>本地视频</p>
     </div>
     <div>
-        <video id="remoteVideo" class="videoWrapper" autoplay></video>
-        <p>对方视频</p>
+        <div>
+            <video id="remoteVideo" class="videoWrapper" autoplay></video>
+            <div class="line">参与者： <span id="onlineNum"></span></div>
+            <div class="line"><span id="onlineUser"></span></div>
+            <div class="line">
+                <p>会见时间:</p>
+                <p>律师姓名:</p>
+                <p>执业证号:</p>
+                <p>执业机构:</p>
+                <p>助手姓名:</p>
+                <p>姓名:</p>
+                <p>身份证号:</p>
+                <p>监管单位:</p>
+            </div>
+        </div>
+        <button onclick="exit()">结束会议</button>
     </div>
-
-    <div style="display: none">
-        <video id="screenVideo" class="videoWrapper" autoplay></video>
-        <p>屏幕共享</p>
-    </div>
-</fieldset>
+</div>
 <div class="tip" style="display: none">备注:chrome要屏幕共享需要在属性中添加--enable-usermedia-screen-capturing</div>
 <br/>
-<fieldset>
-    <!--    <legend>操作</legend>-->
+<div class="singleLine">
+<!--    <button style="display: none" class="butinput" id="connectid" onclick="startWSConnect()">呼叫</button>-->
+    <button class="butinput" id="startcallid" onclick="startCall()">呼叫</button>
+    <button style="display: none" class="butinput" id="closewsid" onclick="exit()" disabled>离开</button>
+</div>
+<fieldset style="display: none">
     <div class="line">房间号：
         <input class="butinput" id="roomid" placeholder="输入房间号"/>
     </div>
-    <div class="line">房间在线人数： <span id="onlineNum"></span></div>
-    <div class="line">房间在线用户： <span id="onlineUser"></span></div>
+
     <div class="line">用户名：
         <input class="butinput" id="userid" placeholder="输入用户名"/>
     </div>
+
     <div class="line">
-        <button class="butinput" id="connectid" onclick="startWSConnect()">加入</button>
-        <button class="butinput" id="closewsid" onclick="exit()" disabled>离开</button>
-    </div>
-    <div class="line">
-        <button class="butinput" id="startcallid" onclick="startCall()" disabled>呼叫</button>
         <button class="butinput" id="screenid" onclick="startScreen()" disabled style="display: none">屏幕共享</button>
         <button class="butinput" id="mutedid" onclick="speaker()" disabled>开启/关闭扬声器</button>
     </div>
 </fieldset>
 
 <br/>
-<fieldset>
+<fieldset style="display: none">
     <legend>通知</legend>
     <div id="message"></div>
 </fieldset>
@@ -56,6 +62,6 @@
 
 <script src="adapter.js"></script>
 <script src="tools.js"></script>
-<script src="main.js"></script>
+<script src="main2.js"></script>
 </body>
 </html>
