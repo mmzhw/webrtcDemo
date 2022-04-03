@@ -10,12 +10,13 @@ let servers = {
         }
     ]
 };
-let pc = new RTCPeerConnection(servers);
+let pc = null;
+let screenPc = null;
 let localStream = null;
 let remoteStream = null;
 let isCalled = false;
 
-let screenPc = new RTCPeerConnection(servers);
+
 let screenStatus = false;
 let isScreened = false;
 
@@ -46,8 +47,6 @@ let startWSConnect = () => {
         document.getElementById('roomid').disabled = true;
         document.getElementById('connectid').disabled = true;
         document.getElementById('startcallid').disabled = false;
-        document.getElementById('closewsid').disabled = false;
-        document.getElementById('mutedid').disabled = false;
         document.getElementById('screenid').disabled = false;
 
         document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + '成功加入房间' + room;
@@ -65,12 +64,17 @@ let startWSConnect = () => {
         let result = typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
         if (result.code === '-1') {
             document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + result.message;
-            exit();
+            exit(true);
             return;
         }
         if (result.code === '99') {
             document.getElementById('onlineNum').innerHTML = result.result.length;
             document.getElementById('onlineUser').innerHTML = result.result.join('， ');
+            return;
+        }
+
+        if (result.direction === 'leave') {
+            exit(true);
             return;
         }
 
@@ -95,8 +99,6 @@ let startWSConnect = () => {
         }
     };
 };
-
-
 let startCall = () => {
     screenStatus = false;
     navigator.mediaDevices.getUserMedia({
@@ -111,7 +113,26 @@ let startCall = () => {
         createOfferAndAnswer();
     }).catch();
 };
-
+let createPC = () => {
+    pc = new RTCPeerConnection(servers);
+    pc.onicecandidate = (event) => {
+        if (event && event.candidate) {
+            console.log(event.candidate);
+        } else {
+            let data = {
+                direction: 'call',
+                type: pc.localDescription.type,
+                sdp: pc.localDescription.sdp,
+                screen: 0,
+            };
+            socket.send(JSON.stringify(data));
+        }
+    };
+    pc.ontrack = (event) => {
+        remoteStream = event.streams[0];
+        remoteVideo.srcObject = remoteStream;
+    };
+};
 let startScreen = () => {
     screenStatus = true;
     let mediaPar = {
@@ -139,8 +160,25 @@ let startScreen = () => {
         createOfferAndAnswer();
     }).catch();
 };
-
-
+let createScreenPC = () => {
+    screenPc = new RTCPeerConnection(servers);
+    screenPc.onicecandidate = (event) => {
+        if (event && event.candidate) {
+            console.log(event.candidate);
+        } else {
+            let data = {
+                direction: 'call',
+                type: screenPc.localDescription.type,
+                sdp: screenPc.localDescription.sdp,
+                screen: 1,
+            };
+            socket.send(JSON.stringify(data));
+        }
+    };
+    screenPc.ontrack = (event) => {
+        screenVideo.srcObject = event.streams[0];
+    };
+};
 let createOfferAndAnswer = () => {
     let mediaConstraints = {
         audio: true,
@@ -163,61 +201,43 @@ let createOfferAndAnswer = () => {
     }
 };
 
-pc.onicecandidate = (event) => {
-    if (event && event.candidate) {
-        console.log(event.candidate);
-    } else {
-        let data = {
-            direction:'call',
-            type: pc.localDescription.type,
-            sdp: pc.localDescription.sdp,
-            screen: 0,
-        };
-        socket.send(JSON.stringify(data));
+let exit = (notNotify) => {
+    if (!notNotify) {
+        socket.send(JSON.stringify({ direction: 'leave', value: user }));
     }
-};
-
-pc.ontrack = (event) => {
-    remoteStream = event.streams[0];
-    remoteVideo.srcObject = remoteStream;
-};
-
-screenPc.onicecandidate = (event) => {
-    if (event && event.candidate) {
-        console.log(event.candidate);
-    } else {
-        let data = {
-            direction:'call',
-            type: screenPc.localDescription.type,
-            sdp: screenPc.localDescription.sdp,
-            screen: 1,
-        };
-        socket.send(JSON.stringify(data));
-    }
-};
-
-screenPc.ontrack = (event) => {
-    screenVideo.srcObject = event.streams[0];
-};
-
-
-let exit = () => {
     document.getElementById('message').innerHTML = document.getElementById('message').innerHTML + '<br/>' + '离开房间';
-    document.getElementById('startcallid').disabled = true;
-    document.getElementById('closewsid').disabled = true;
-    document.getElementById('mutedid').disabled = true;
-    document.getElementById('screenid').disabled = true;
-    document.getElementById('connectid').disabled = false;
+    document.getElementById('startcallid').disabled = false;
+    document.getElementById('screenid').disabled = false;
     document.getElementById('userid').disabled = false;
     document.getElementById('roomid').disabled = false;
-    socket.close();
-    pc.close()
-    screenPc.close()
-};
 
-let speaker = () => {
-    remote.muted = !remote.muted;
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+    }
+    localVideo.srcObject = null;
+    remoteVideo.srcObject = null;
+    screenVideo.srcObject = null;
+
+    if (pc) {
+        pc.close();
+        pc = null;
+    }
+    if (screenPc) {
+        screenPc.close();
+    }
+
+    isCalled = false;
+
+    createPC();
+    createScreenPC();
 };
 
 
 startWSConnect();
+createPC();
+createScreenPC();
+window.onbeforeunload = function () {
+    console.log('发送leave消息');
+    socket.send(JSON.stringify({ direction: 'leave', value: user }));
+};

@@ -9,7 +9,7 @@ const options = {
     cert: fs.readFileSync('./_.youxiang.com.crt')
 };
 
-app.use(static(__dirname + '/html/', { extensions: ['html'] }));
+app.use(static(__dirname + '/', { extensions: ['html'] }));
 
 let server = https.createServer(options, app.callback()).listen(3002);
 let wss = new WebSocket.Server({ server });
@@ -22,7 +22,6 @@ function sendRoomPeoples () {
     wss.clients.forEach(function (client) {
         client.send(JSON.stringify({
             code: '99',
-            message: '当前房间内人员数:' + wss.clients.size,
             result: users
         }));
     });
