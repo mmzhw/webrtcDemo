@@ -14,10 +14,12 @@ app.use(static(__dirname + '/', { extensions: ['html'] }));
 let server = https.createServer(options, app.callback()).listen(3002);
 let wss = new WebSocket.Server({ server });
 
-function sendRoomPeoples () {
+function sendRoomPeoples (room) {
     let users = [];
     wss.clients.forEach((j) => {
-        users.push(j.userID);
+        if (j.room === room) {
+            users.push(j.userID);
+        }
     });
     wss.clients.forEach(function (client) {
         client.send(JSON.stringify({
@@ -36,7 +38,7 @@ wss.on('connection', function (wsClient, reg) {
         if (result && result.direction === 'name') {
             console.log(result.value + '设置成功');
             wsClient.userID = result.value;
-            sendRoomPeoples();
+            sendRoomPeoples(wsClient.room);
         } else {
             wss.clients.forEach(function (client) {
                 if (client.room === wsClient.room && wsClient.userID !== client.userID) {
@@ -47,7 +49,7 @@ wss.on('connection', function (wsClient, reg) {
     });
 
     wsClient.on('close', function () {
-        sendRoomPeoples();
+        sendRoomPeoples(wsClient.room);
         console.log('ws is closed');
     });
 

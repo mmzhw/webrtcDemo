@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>视频通话</title>
 </head>
 <style>
     body {
         margin: 0;
+        background: url("bg.jpg") no-repeat;
+        background-size: 100% 100%;
     }
 
     .videoWrapper {
@@ -21,7 +23,7 @@
 
     .line {
         margin-bottom: 10px;
-        background: #cccccc;
+        background: rgba(255, 255, 255, .5);
         padding: 5px;
         box-sizing: border-box;
     }
@@ -44,7 +46,7 @@
     }
 
     .videoContent > div:nth-child(2) {
-        width: 300px;
+        width: 350px;
         margin-left: 20px;
         display: flex;
         flex-direction: column;
@@ -53,6 +55,7 @@
 
     .videoContent > div:nth-child(2) > div:nth-child(1) > video {
         margin-bottom: 10px;
+        width: 100%;
     }
 
     .videoContent > div:nth-child(2) > div:nth-child(2) {
@@ -84,22 +87,29 @@
 </style>
 <div class="videoContent">
     <div>
-        <video id="localVideo" class="videoWrapper" autoplay muted></video>
+        <video id="remoteVideo" class="videoWrapper" autoplay></video>
     </div>
     <div>
         <div>
-            <video id="remoteVideo" class="videoWrapper" autoplay></video>
+            <video id="localVideo" class="videoWrapper" autoplay muted></video>
             <div class="line">参与者： <span id="onlineNum"></span></div>
             <div class="line"><span id="onlineUser"></span></div>
             <div class="line">
-                <p>会见时间:</p>
-                <p>律师姓名:</p>
-                <p>执业证号:</p>
-                <p>执业机构:</p>
-                <p>助手姓名:</p>
-                <p>姓名:</p>
-                <p>身份证号:</p>
-                <p>监管单位:</p>
+                <p>会见时间：2022年4月6号 9：00-10：00</p>
+                <p>会见理由：了解案情</p>
+            </div>
+            <div class="line">
+                <p style="font-weight: bold">律师信息</p>
+                <p>律师姓名：王律师</p>
+                <p>执业证号：11101202211433211</p>
+                <p>执业机构：北京市方桥律师事务所</p>
+                <p>助手姓名：李律师</p>
+            </div>
+            <div class="line">
+                <p style="font-weight: bold">在押人员信息</p>
+                <p>姓名：王某某</p>
+                <p>身份证号码：110101199002081124</p>
+                <p>监管单位：北京市丰台区看守所</p>
             </div>
         </div>
         <div>
@@ -157,6 +167,16 @@
     }
     let socket = null;
 
+    remoteVideo.onloadedmetadata = function () {
+        if (this.videoWidth > this.videoHeight) {
+            this.style.width = '100%';
+            this.style.height = 'auto';
+        } else {
+            this.style.width = 'auto';
+            this.style.height = '100%';
+        }
+    };
+
     function exit (notNotify) {
         if (!notNotify) {
             socket.send(JSON.stringify({ direction: 'leave', value: user }));
@@ -167,7 +187,7 @@
 
         if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
-            localStream = null
+            localStream = null;
         }
         localVideo.srcObject = null;
         remoteVideo.srcObject = null;
